@@ -1,22 +1,24 @@
---SELECT
--- *
---FROM
--- CovidProject.dbo.CovidDeaths AS Deaths
+-- DATA EXPLORATION WITH SQL
 
---SELECT 
--- *
---FROM
--- CovidProject.dbo.CovidVaccinations AS Vaccinations
+-- First we select the data from the two datasets to view
 
--- Selecting columns I will be focusing on
+SELECT *
+FROM
+ CovidProject.dbo.CovidDeaths
+--
+SELECT *
+FROM
+ CovidProject.dbo.CovidVaccinations AS Vaccinations
+
+-- We select columns we will be focusing on
 
 SELECT
  location, date, total_cases, new_cases, total_deaths, population
 FROM
  CovidProject.dbo.CovidDeaths
 
--- Comparing Total cases vs Total deaths
--- Shows likelihood of death if you contract Covid in your location/country
+-- Comparing total cases vs. total deaths in location 'Africa'
+-- Shows likelihood of death if you contract Covid-19 in 'Africa'
 
 SELECT
  location, date, total_cases, total_deaths,
@@ -26,8 +28,8 @@ FROM
 WHERE
  total_deaths IS NOT NULL AND location = 'Africa'
 
--- Looking at Total cases vs Population
--- shows the percentage of the population that has contracted Covid
+-- Looking at total cases vs. population
+-- Shows the percentage of the population that has contracted Covid-19
 
 SELECT
  location, date, total_cases, population,
@@ -37,7 +39,7 @@ FROM
 WHERE 
  location = 'Africa'
 
--- Max contraction rate vs. Population
+-- Looking at max contraction rate vs. population
 
 SELECT
  location, population, MAX(total_cases) AS max_total_cases,
@@ -50,14 +52,15 @@ ORDER BY
  max_contraction_rate DESC
 
 -- Looking at max deaths vs. population as 'max death rate'
--- 
 
 SELECT
  location, population, MAX(CAST(total_deaths as int)) AS max_total_deaths,
  MAX((CAST(total_deaths as int) / population))*100 AS max_death_rate
 FROM
  CovidProject.dbo.CovidDeaths
+ 
 -- Removing instances where location is continent instead of country
+ 
 WHERE 
  continent IS NOT NULL
 GROUP BY 
@@ -66,7 +69,7 @@ ORDER BY
  max_total_deaths DESC
 
 -- Looking at max death rate by continent instead of location
--- due to discrapancies in original data format, filtering by continent requires that we select location where continent is "null"
+-- due to discrapancies in original data format, filtering by continent requires that we select location where continent is 'null'
 
 SELECT
 location, MAX(CAST(total_deaths as int))AS max_total_deaths
@@ -79,7 +82,7 @@ GROUP BY
 ORDER BY
  max_total_deaths DESC
 
--- For the sake of visualization, we revert to filtering by continent where continent is 'null'
+-- As the aim is ultimately prepare this analysis for visualization, we revert to filtering by continent where continent is 'null'
 
 SELECT
 continent, MAX(CAST(total_deaths as int))AS max_total_deaths
@@ -104,7 +107,7 @@ WHERE
 ORDER BY 
  death_rate_globe DESC
 
- -- Creating View for above death_rate_globe query
+ -- Creating View for above death_rate_globe query for future reference if needed
 
 CREATE VIEW death_rate_globe
 AS
@@ -115,10 +118,8 @@ FROM
  CovidProject.dbo.CovidDeaths
 WHERE 
  continent IS NOT NULL 
---ORDER BY 
--- death_rate_globe DESC
 
--- Joining CovidDeaths table with CovidVaccinations table
+-- Joining 'CovidDeaths' table with 'CovidVaccinations' table
 -- Looking at populations vs. vaccinations and number of vaccinations per date
 
 SELECT 
@@ -148,9 +149,6 @@ JOIN CovidProject.dbo.CovidVaccinations AS Vaccinations
   AND Deaths.date = Vaccinations.date
 WHERE 
  Deaths.continent IS NOT NULL
---ORDER BY 
- --location, date
-
 
 -- inserting CTE to be able to execute additional aggregation that normal query will not allow
 -- CTE name 'PopvsVac'
@@ -178,6 +176,7 @@ FROM
 
 -- Instead of a CTE, we could use a TEMP TABLE to achieve the above
 -- TEMP TABLE
+ 
 DROP TABLE IF EXISTS #temp_PopvsVac
 CREATE TABLE #temp_PopvsVac
 (continent nvarchar(255), location nvarchar(255), date datetime, population numeric, new_vaccinations numeric, live_vaccinations_count numeric)
@@ -214,4 +213,6 @@ JOIN CovidProject.dbo.CovidVaccinations AS Vaccinations
   AND Deaths.date = Vaccinations.date
 WHERE 
  Deaths.continent IS NOT NULL
+
+-- END
 

@@ -1,4 +1,5 @@
--- DATA CLEANING WITH SQL
+-- DATA CLEANING WITH SQL (Microsoft SQL Server Management Studio)
+-- Database `NashvilleHousing.dbo.Housing_data`
 
 -- To start, we select the whole dataset to view
 
@@ -15,6 +16,7 @@ FROM
 
 -- Updating 'SaleDateConverted' column into the dataset
 --Selecting SaleDate to view
+	
 SELECT 
  SaleDate
 FROM 
@@ -42,16 +44,14 @@ FROM
 -- Populating PropertyAddress cells where PropertyAddress is 'null' using unique ParcelID as reference
 -- Selecting all data where PropertyAddress is null to view
 
-SELECT
- *
+SELECT *
 FROM 
  NashvilleHousing.dbo.Housing_data
 WHERE 
  PropertyAddress IS NULL
 
 -- Looking at ParcelID in context of the entire dataset
-SELECT
- *
+SELECT *
 FROM 
  NashvilleHousing.dbo.Housing_data
 ORDER BY
@@ -91,7 +91,7 @@ FROM
 WHERE 
  PropertyAddress IS NULL
 
--- Changing format of PropertyAddress to have the address and city in different columns using SUBSTRING and CHARINDEX functions
+-- Changing format of PropertyAddress to have the address and city in separate columns using SUBSTRING and CHARINDEX functions
 -- Selecting PropertyAddress to view
 SELECT
  PropertyAddress
@@ -196,7 +196,7 @@ ROW_NUMBER() OVER (
 FROM
  NashvilleHousing.dbo.Housing_data
  )
-SELECT * 
+DELETE * 
 FROM RowNumCTE
 WHERE
  RowNum > 1
@@ -209,5 +209,5 @@ DROP COLUMN PropertyAddress, OwnerAddress, TaxDistrict
 ALTER TABLE NashvilleHousing.dbo.Housing_data
 DROP COLUMN SaleDate
 
-
+-- Now the data would be more useful for analysis to gain valuable insights
 -- END

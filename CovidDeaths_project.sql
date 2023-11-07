@@ -1,4 +1,5 @@
--- DATA EXPLORATION WITH SQL
+-- DATA EXPLORATION WITH SQL (Microsoft SQL Server Management Studio)
+-- Datasets `CovidProject.dbo.CovidDeaths` & `CovidProject.dbo.CovidVaccinations`
 
 -- First we select the data from the two datasets to view
 
@@ -8,9 +9,9 @@ FROM
 --
 SELECT *
 FROM
- CovidProject.dbo.CovidVaccinations AS Vaccinations
+ CovidProject.dbo.CovidVaccinations
 
--- We select columns we will be focusing on
+-- We select columns we will be focusing on from the `dbo.CovidDeaths` dataset
 
 SELECT
  location, date, total_cases, new_cases, total_deaths, population
@@ -18,7 +19,7 @@ FROM
  CovidProject.dbo.CovidDeaths
 
 -- Comparing total cases vs. total deaths in location 'Africa'
--- Shows likelihood of death if you contract Covid-19 in 'Africa'
+-- Shows likelihood of death if you contracted Covid-19 in 'Africa'
 
 SELECT
  location, date, total_cases, total_deaths,
@@ -28,7 +29,7 @@ FROM
 WHERE
  total_deaths IS NOT NULL AND location = 'Africa'
 
--- Looking at total cases vs. population
+-- Looking at total cases vs. population in location 'Africa'
 -- Shows the percentage of the population that has contracted Covid-19
 
 SELECT
@@ -39,7 +40,7 @@ FROM
 WHERE 
  location = 'Africa'
 
--- Looking at max contraction rate vs. population
+-- Looking at max contraction rate vs. population for all locations in dataset
 
 SELECT
  location, population, MAX(total_cases) AS max_total_cases,
@@ -51,7 +52,8 @@ GROUP BY
 ORDER BY
  max_contraction_rate DESC
 
--- Looking at max deaths vs. population as 'max death rate'
+-- Looking at max deaths vs. population for all locations in dataset
+-- We use CAST to convert the 'total_deaths' data type to a numerical value (int) instead of a character/string value 
 
 SELECT
  location, population, MAX(CAST(total_deaths as int)) AS max_total_deaths,
@@ -72,7 +74,7 @@ ORDER BY
 -- due to discrapancies in original data format, filtering by continent requires that we select location where continent is 'null'
 
 SELECT
-location, MAX(CAST(total_deaths as int))AS max_total_deaths
+location, MAX(CAST(total_deaths as int)) AS max_total_deaths
 FROM 
  CovidProject.dbo.CovidDeaths
 WHERE 
@@ -82,7 +84,7 @@ GROUP BY
 ORDER BY
  max_total_deaths DESC
 
--- As the aim is ultimately prepare this analysis for visualization, we revert to filtering by continent where continent is 'null'
+-- As the aim is ultimately prepare this data for analysis and visualization, we revert to filtering by continent where continent is 'null'
 
 SELECT
 continent, MAX(CAST(total_deaths as int))AS max_total_deaths
@@ -166,8 +168,6 @@ JOIN CovidProject.dbo.CovidVaccinations AS Vaccinations
   AND Deaths.date = Vaccinations.date
 WHERE 
  Deaths.continent IS NOT NULL
---ORDER BY 
--- location, date
  )
 SELECT *,
  (live_vaccinations_count / population)*100 AS percentage_of_population_vaccinated
@@ -180,7 +180,7 @@ FROM
 DROP TABLE IF EXISTS #temp_PopvsVac
 CREATE TABLE #temp_PopvsVac
 (continent nvarchar(255), location nvarchar(255), date datetime, population numeric, new_vaccinations numeric, live_vaccinations_count numeric)
-
+--
 INSERT INTO #temp_PopvsVac 
 SELECT 
 Deaths.continent, Deaths.location, Deaths.date, population, Vaccinations.new_vaccinations,
@@ -214,5 +214,6 @@ JOIN CovidProject.dbo.CovidVaccinations AS Vaccinations
 WHERE 
  Deaths.continent IS NOT NULL
 
+-- The extent of data exploration is dependent on the business case and objective, the steps taken above are the most common, but not all there is to the process
 -- END
 

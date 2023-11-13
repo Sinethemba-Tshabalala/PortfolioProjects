@@ -1,5 +1,7 @@
--- Inspecting and analyzing sales data to gain insights to present to the relevant stakeholders
+-- DATA ANALYSIS AND EXPLORATION WITH SQL (Microsoft SQL Server Management Studio)
+-- Database `Sales.dbo.sales_data_sample`
 
+-- Inspecting and analyzing sales data to gain insights to present to the relevant stakeholders
 -- Selecting all the data to view
 SELECT 
  *
